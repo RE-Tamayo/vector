@@ -1,0 +1,19 @@
+{
+    "name": "retamayo/vector",
+    "description": "A routing library for php",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Retamayo\\Vector\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "RE-Tamayo",
+            "email": "rosas.emerjoe.tamayo@gmail.com"
+        }
+    ],
+    "minimum-stability": "alpha",
+    "require": {}
+}
