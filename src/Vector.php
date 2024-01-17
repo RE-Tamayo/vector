@@ -2,6 +2,7 @@
 
 namespace Retamayo\Vector;
 
+use Retamayo\Vector\Classes\DefaultFileCreator;
 use Retamayo\Vector\Classes\PathResolver;
 use Retamayo\Vector\Classes\File;
 
@@ -9,6 +10,7 @@ class Vector {
 
     private static ?Vector $instance = null;
     private array $routes = [];
+    private array $httpResponses = [];
 
     public static function getInstance() {
         if (null === self::$instance) {
@@ -18,14 +20,12 @@ class Vector {
     }
 
     public function run(bool $secure = false, bool $csrfToken = false) {
-        File::createPath(PathResolver::getRouteDirPath());
-        File::createFile(PathResolver::getRouteFilePath());
-        File::createPath(PathResolver::getConfigDirPath());
-        File::createFile(PathResolver::getRouteConfigPath());
-        File::writeFile(PathResolver::getRouteConfigPath(), $this->createDefaultRouteConfig());
-        File::writeFile(PathResolver::getRouteFilePath(), $this->createDefaultRoutes());
-        require_once PathResolver::getRouteConfigPath();
-        require_once PathResolver::getRouteFilePath();
+        //Creates the routes file
+        DefaultFileCreator::createRoute();
+        //Creates the http responses
+        DefaultFileCreator::createHttpResponses();
+        //Add default http responses
+        $this->addHttpResponse('404', PathResolver::getHttpResponseDirPath() . '/404.html');
 
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $method = $_SERVER['REQUEST_METHOD'];
@@ -49,7 +49,7 @@ class Vector {
                 return;
             }
         }
-        include DEFAULT_404;
+        include $this->httpResponses[404];
         http_response_code(404);
     }
 
@@ -61,32 +61,7 @@ class Vector {
         $this->routes['POST'][$route] = $path;
     }
 
-    private function createDefaultRoutes() {
-        $buffer = <<<EOF
-        <?php
-
-        //Static routes
-        \$this->get("/", function () {
-            echo "Hello World";
-        });
-
-        //Dynamic routes
-        \$this->get("/profile/{name}", function (\$name) {
-            echo "Hello \$name";
-        });
-
-        EOF;
-        return $buffer;
-    }
-
-    private function createDefaultRouteConfig() {
-        $buffer = <<<EOF
-        <?php
-        
-        //Define Default 404 Route.
-        define('DEFAULT_404', 'views/404.html');
-
-        EOF;
-        return $buffer;
+    public function addHttpResponse(string $route, string|callable $path) {
+        $this->httpResponses[$route] = $path;
     }
 }

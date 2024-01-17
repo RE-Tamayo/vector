@@ -6,7 +6,7 @@ class PathResolver
 {
     public static function getBasePath()
     {
-        return dirname(dirname(dirname(dirname(__DIR__))));
+        return dirname(dirname(dirname(dirname(dirname(__DIR__)))));
     }
 
     public static function getLibPath()
@@ -29,8 +29,23 @@ class PathResolver
         return self::getBasePath() . '/config';
     }
 
+    public static function getHttpResponseDirPath()
+    {
+        return self::getBasePath() . '/config/http_responses';
+    }
+
+    public static function getHttpResponseFilePath($code)
+    {
+        return self::getBasePath() . '/config/http_responses/' . $code . '.html';
+    }
+
     public static function getRouteConfigPath()
     {
         return self::getBasePath() . '/config/route_config.php';
+    }
+
+    public static function getPublishablePath()
+    {
+        return self::getLibPath() . '/Publishable';
     }
 }
